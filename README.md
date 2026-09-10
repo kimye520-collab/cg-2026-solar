@@ -1,1 +1,7 @@
 https://cg.catholic.ac.kr/~mgchoi/CG/demos/d02-transform-lab.html?d=eyJyYW5nZSI6eyJ4IjoiNDIwMDAwIiwieSI6IjQyMDAwMCIsInoiOiI0MjAwMDAifSwib2JqZWN0cyI6W3siaWQiOiJlYXJ0aCIsIm5hbWUiOiLsp4DqtawiLCJjb2xvciI6WzAuMzUsMC42LDAuOTVdLCJzdGVwcyI6W3sidHlwZSI6IlN1IiwiYXJncyI6WyI2MzcxIl19XX0seyJpZCI6Im1vb24iLCJuYW1lIjoi64usIiwiY29sb3IiOlswLjc4LDAuNzgsMC44Ml0sInN0ZXBzIjpbeyJ0eXBlIjoiUnoiLCJhcmdzIjpbInQqKDM2MC8yNy4zKSJdfSx7InR5cGUiOiJUIiwiYXJncyI6WyIzODQ0MDAiLCIwIiwiMCJdfSx7InR5cGUiOiJSeiIsImFyZ3MiOlsiMTgwIl19LHsidHlwZSI6IlN1IiwiYXJncyI6WyIxNzM3LjQiXX1dfSx7ImlkIjoic2F0IiwibmFtZSI6IuyduOqzteychOyEsSIsImNvbG9yIjpbMC45NSwwLjcyLDAuMzVdLCJzdGVwcyI6W3sidHlwZSI6IlJ4IiwiYXJncyI6WyI5OC4xMjY2Il19LHsidHlwZSI6IlJ6IiwiYXJncyI6WyJ0KigzNjAgLyA1OTI4KSJdfSx7InR5cGUiOiJUIiwiYXJncyI6WyI3MDYzLjA5NiIsIjAiLCIwIl19LHsidHlwZSI6IlJ6IiwiYXJncyI6WyIxODAiXX0seyJ0eXBlIjoiU3UiLCJhcmdzIjpbIjAuMDAzNSJdfV19XX0%3D
+1.거리의 단위를 무엇으로 정했는가? 왜 그렇게 정했는가?
+킬로미터 단위를 사용했습니다. 우주 전체 간 및 위성 간 실제 물리적 거리를 계산하고 행렬 변환에 입력할 때 수치 오차를 줄이고 직관적으로 매핑하기 위해 km단위를 썼습니다.
+2.숫자가 커서 생긴 문제가 있었는가? 있었다면 무엇인가?
+있었습니다. 아리랑 3호가 실제 본체 크기가 극도로 작아서 화면상에서 완전히 사라졌습니다.
+3.달·위성이 지구를 향하게 만든 것은 어느 변환 단계 덕분인가?
+T를 적용하기 전에 로컬 +X축 화살표가 지구 중심(원점)을 바라보도록 정렬해 준 Rz(180도) 덕분입니다
