@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3주차 실습 2 — 나만의 행성 (Lava Planet)</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #020205; }
+  canvas { display: block; width: 100vw; height: 100vh; }
+</style>
+</head>
+<body>
+<canvas id="glcanvas"></canvas>
+
+<script>
+'use strict';
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1. 정밀한 구(Sphere) 메시 생성 함수
+   ══════════════════════════════════════════════════════════════════════════ */
+function makeSphere(radius, rows, cols, red, green, blue) {
+  const positions = [];
+  const normals = [];
+  const colors = [];
+  const indices = [];
+
+  for (let i = 0; i <= rows; i++) {
+    const phi = Math.PI * i / rows;
+    for (let j = 0; j <= cols; j++) {
+      const theta = 2 * Math.PI * j / cols;
+
+      const nx = Math.sin(phi) * Math.cos(theta);
+      const ny = Math.cos(phi);
+      const nz = Math.sin(phi) * Math.sin(theta);
+
+      positions.push(nx * radius, ny * radius, nz * radius);
+      normals.push(nx, ny, nz);
+      colors.push(red, green, blue);
+    }
+  }
+
+  const stride = cols + 1;
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      const topLeft = i * stride + j;
+      const topRight = topLeft + 1;
+      const bottomLeft = topLeft + stride;
+      const bottomRight = bottomLeft + 1;
+
+      indices.push(topLeft, bottomLeft, topRight);
+      indices.push(topRight, bottomLeft, bottomRight);
+    }
+  }
+
+  return {
+    positions: new Float32Array(positions),
+    normals:   new Float32Array(normals),
+    colors:    new Float32Array(colors),
+    indices:   new Uint16Array(indices),
+  };
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. 버텍스 셰이더 — 물체 기준 표면 좌표(vSurf) 추가 전달
+   ══════════════════════════════════════════════════════════════════════════ */
+const VS_SOURCE = `#version 300 es
+layout(location = 0) in vec3 aPos;
+layout(location = 1) in vec3 aNormal;
+layout(location = 3) in vec3 aColor;
+
+uniform float uTime;
+uniform mat4  uModel;
+uniform mat4  uViewProj;
+
+out vec3 vColor;
+out vec3 vNormal;   // 세계 기준 법선 (광원 계산)
+out vec3 vSurf;     // 물체 기준 좌표 (행성이 돌 때 무늬가 자전하도록 고정)
+
+void main() {
+  vColor  = aColor;
+  vNormal = mat3(uModel) * aNormal;
+  vSurf   = aNormal; // 회전 전의 순수 법선/위치
+  gl_Position = uViewProj * uModel * vec4(aPos, 1.0);
+}
+`;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. 프래그먼트 셰이더 — 절차적 잡음(Procedural Noise) 기반 용암 행성
+   ══════════════════════════════════════════════════════════════════════════ */
+const FS_SOURCE = `#version 300 es
+precision highp float;
+
+in vec3 vColor;
+in vec3 vNormal;
+in vec3 vSurf;
+
+uniform float uTime;
+
+out vec4 fragColor;
+
+// 1) 3D 가짜 난수 함수
+float hash31(vec3 p) {
+  p = fract(p * 0.3183099 + vec3(0.71, 0.113, 0.419));
+  p *= 17.0;
+  return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
+}
+
+// 2) 3D 노이즈 함수 (Smoothstep 보간 적용)
+float noise3(vec3 x) {
+  vec3 i = floor(x);
+  vec3 f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(hash31(i + vec3(0,0,0)), hash31(i + vec3(1,0,0)), f.x),
+                 mix(hash31(i + vec3(0,1,0)), hash31(i + vec3(1,1,0)), f.x), f.y),
+             mix(mix(hash31(i + vec3(0,0,1)), hash31(i + vec3(1,0,1)), f.x),
+                 mix(hash31(i + vec3(0,1,1)), hash31(i + vec3(1,1,1)), f.x), f.y), f.z);
+}
+
+// 3) fBm (Fractional Brownian Motion) - 여러 겹의 노이즈 중첩
+float fbm(vec3 p) {
+  float v = 0.0, a = 0.5;
+  for (int i = 0; i < 5; i++) {
+    v += a * noise3(p);
+    p *= 2.02;
+    a *= 0.5;
+  }
+  return v;
+}
+
+void main() {
+  vec3 N = normalize(vNormal);
+  vec3 S = normalize(vSurf);
+  vec3 L = normalize(vec3(0.8, 0.5, 0.6)); // 광원 방향
+
+  // [계산 1] 시간이 지남에 따라 일렁이는 용암 표면 노이즈
+  vec3 flowPos = S * 4.0 + vec3(0.0, uTime * 0.15, uTime * 0.05);
+  float n = fbm(flowPos);
+
+  // [계산 2] 갈라진 용암 틈새 표현 (abs 함수 활용)
+  float crack = smoothstep(0.08, 0.25, abs(n - 0.45));
+
+  // [계산 3] 색상 구성 (굳은 암석 vs 뜨거운 용암)
+  vec3 darkRock = vec3(0.08, 0.06, 0.07);  // 식은 암석 (어두운 회색)
+  vec3 hotLava  = vec3(1.0, 0.35, 0.05);   // 뜨거운 용암 (주황)
+  vec3 coreLava = vec3(1.0, 0.9, 0.3);    // 매우 뜨거운 중심부 (노랑)
+
+  // 틈새(crack)가 좁은 곳일수록 용암 색상으로 표현
+  vec3 lavaColor = mix(coreLava, hotLava, crack * 3.0);
+  vec3 albedo = mix(lavaColor, darkRock, crack);
+
+  // [계산 4] 기본 조명 (낮과 밤)
+  float diff = max(dot(N, L), 0.0);
+  
+  // [계산 5] 발광 효과 - 용암은 밤면에서도 스스로 빛을 냄
+  float glow = (1.0 - crack) * 1.5; 
+  vec3 color = albedo * (0.15 + 0.85 * diff) + (hotLava * glow * 0.8);
+
+  fragColor = vec4(color, 1.0);
+}
+`;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4. WebGL2 설정 및 메인 프로그램
+   ══════════════════════════════════════════════════════════════════════════ */
+const canvas = document.getElementById('glcanvas');
+const gl = canvas.getContext('webgl2');
+if (!gl) throw new Error('WebGL2 비활성화됨');
+
+function compileShader(type, source) {
+  const s = gl.createShader(type);
+  gl.shaderSource(s, source);
+  gl.compileShader(s);
+  return s;
+}
+
+function createProgram(vs, fs) {
+  const p = gl.createProgram();
+  gl.attachShader(p, compileShader(gl.VERTEX_SHADER, vs));
+  gl.attachShader(p, compileShader(gl.FRAGMENT_SHADER, fs));
+  gl.linkProgram(p);
+  return p;
+}
+
+const program = createProgram(VS_SOURCE, FS_SOURCE);
+const uTimeLoc = gl.getUniformLocation(program, 'uTime');
+const uModelLoc = gl.getUniformLocation(program, 'uModel');
+const uViewProjLoc = gl.getUniformLocation(program, 'uViewProj');
+
+const M4 = {};
+M4.identity = () => new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+M4.translate = (tx, ty, tz) => new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, tx,ty,tz,1]);
+M4.scale = (sx, sy, sz) => new Float32Array([sx,0,0,0, 0,sy,0,0, 0,0,sz,0, 0,0,0,1]);
+M4.rotateY = (angle) => { const c = Math.cos(angle), s = Math.sin(angle); return new Float32Array([c,0,-s,0, 0,1,0,0, s,0,c,0, 0,0,0,1]); };
+M4.rotateX = (angle) => { const c = Math.cos(angle), s = Math.sin(angle); return new Float32Array([1,0,0,0, 0,c,s,0, 0,-s,c,0, 0,0,0,1]); };
+M4.multiply = (a, b) => {
+  const out = new Float32Array(16);
+  for (let col = 0; col < 4; col++) {
+    for (let row = 0; row < 4; row++) {
+      let sum = 0;
+      for (let k = 0; k < 4; k++) sum += a[k * 4 + row] * b[col * 4 + k];
+      out[col * 4 + row] = sum;
+    }
+  }
+  return out;
+};
+
+function createMesh(mesh) {
+  const vao = gl.createVertexArray();
+  gl.bindVertexArray(vao);
+  function attribute(data, loc, size) {
+    const buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+    gl.enableVertexAttribArray(loc);
+    gl.vertexAttribPointer(loc, size, gl.FLOAT, false, 0, 0);
+  }
+  attribute(mesh.positions, 0, 3);
+  attribute(mesh.normals, 1, 3);
+  attribute(mesh.colors, 3, 3);
+
+  const ibo = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, ibo);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, mesh.indices, gl.STATIC_DRAW);
+  gl.bindVertexArray(null);
+  return { vao, count: mesh.indices.length };
+}
+
+// 무늬가 정밀해지도록 고해상도 구 mesh(rows=64, cols=128) 생성
+const planet = createMesh(makeSphere(1.3, 64, 128, 1.0, 1.0, 1.0));
+const startTime = performance.now();
+
+function render() {
+  const dpr = window.devicePixelRatio || 1;
+  const w = Math.floor(canvas.clientWidth * dpr);
+  const h = Math.floor(canvas.clientHeight * dpr);
+  if (canvas.width !== w || canvas.height !== h) {
+    canvas.width = w;
+    canvas.height = h;
+  }
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
+  gl.enable(gl.DEPTH_TEST);
+  gl.clearColor(0.02, 0.02, 0.05, 1.0); // 우주 공간처럼 어두운 배경
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+  const time = (performance.now() - startTime) / 1000;
+  const aspect = canvas.width / canvas.height;
+
+  // 우주 공간 카메라 배치
+  let camera = M4.identity();
+  camera = M4.multiply(M4.translate(0, 0, -4), camera);
+  const perspective = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,-1/4, 0,0,0,1]);
+  camera = M4.multiply(perspective, camera);
+  camera = M4.multiply(M4.scale(1 / (1.45 * aspect), 1 / 1.45, -1 / 20), camera);
+
+  gl.useProgram(program);
+  gl.uniform1f(uTimeLoc, time);
+  gl.uniformMatrix4fv(uViewProjLoc, false, camera);
+
+  // 행성 자전 효과 (rotateY)
+  const model = M4.multiply(M4.rotateX(0.32), M4.rotateY(time * 0.2));
+  gl.uniformMatrix4fv(uModelLoc, false, model);
+
+  gl.bindVertexArray(planet.vao);
+  gl.drawElements(gl.TRIANGLES, planet.count, gl.UNSIGNED_SHORT, 0);
+
+  requestAnimationFrame(render);
+}
+requestAnimationFrame(render);
+</script>
+</body>
+</html>
