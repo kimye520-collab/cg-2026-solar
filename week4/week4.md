@@ -6,10 +6,10 @@
 
 | 버전 | 로컬 확인 주소 | GitHub Pages 주소 |
 |---|---|---|
-| 기본 버전 | `http://localhost:8000/week4/baseline/` | `https://<계정>.github.io/<저장소>/week4/baseline/` (실제 배포 주소로 교체) |
-| 개선 버전 | `http://localhost:8000/week4/improved/` | `https://<계정>.github.io/<저장소>/week4/improved/` (실제 배포 주소로 교체) |
+| 기본 버전 | `http://localhost:8000/week4/baseline/` | https://kimye520-collab.github.io/cg-2026-solar/week4/baseline/ |
+| 개선 버전 | `http://localhost:8000/week4/improved/` | https://kimye520-collab.github.io/cg-2026-solar/week4/improved/ |
 
-로컬에서는 저장소 루트에서 `python -m http.server 8000`을 실행한다. 공개 URL은 실제 GitHub Pages 배포 후 확인해 템플릿을 교체한다.
+로컬에서는 저장소 루트에서 `python -m http.server 8000`을 실행한다. 공개 주소는 GitHub Pages에서 실제 배포된 주소를 확인했다.
 
 개선본은 관찰 목록의 지점을 누르면 해당 명판의 정면에 초점을 맞춘다. P1~P6는 원근 투영을 유지한다. O1을 선택하면 +z 쪽 전면에서, O2는 +x 쪽 오른쪽 측면에서 직교 투영으로 비교한다. O1·O2의 초기 거리는 모두 10 m, 직교 half-height는 3 m로 같으며 휠로 배율을 조절할 수 있다. 비교 과제 재선택은 같은 기준 방향과 배율을 복원한다. 드래그는 회전, Shift+드래그 또는 오른쪽 버튼 드래그는 평행 이동, 휠은 거리·직교 배율 조절이다. 전체 보기 버튼 또는 Home 키는 처음 카메라와 모델 표시 상태로 돌아간다.
 
@@ -91,7 +91,7 @@
 
 AI가 제안한 대상별 카메라 이동은 채택했다. 다만 비교 과제를 일반 표지처럼 원근 이동만 시키는 것으로 충분하지 않다고 판단해, 과제 지침의 전면·측면 직교 요구에 맞게 별도 투영을 추가했다. 첫 비교 화면에서 주변 구조가 가리는 것도 실행 화면으로 확인한 뒤 임시 숨김과 복귀 상태 안내를 보완했다.
 
-- [ ] 실제 GitHub Pages 주소를 위 표에 입력하고 공개된 페이지가 실행되는지 확인
+- [x] 실제 GitHub Pages 주소를 위 표에 입력하고 공개된 페이지가 실행되는지 확인
 - [ ] 기본 버전 P1~P6/O1/O2 관찰 표와 불편 3개 이상을 캡처와 함께 작성
 - [ ] 같은 조건으로 개선 전후 측정 표 작성
 - [ ] 다른 화면 크기에서도 모델이 찌그러지지 않는지 직접 확인
