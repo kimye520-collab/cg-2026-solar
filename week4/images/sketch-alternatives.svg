@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="600" viewBox="0 0 1000 600" role="img" aria-labelledby="title desc">
+  <title id="title">관찰 인터페이스 대안 스케치</title>
+  <desc id="desc">작은 4분할 관찰 창과 선택 지점에 집중하는 큰 3D 화면을 비교한 설계 스케치</desc>
+  <rect width="1000" height="600" fill="#f4f6f9"/>
+  <text x="40" y="48" font-family="sans-serif" font-size="26" font-weight="700" fill="#172033">관찰 인터페이스 대안 스케치</text>
+  <g transform="translate(40 82)">
+    <rect width="430" height="440" rx="14" fill="#fff" stroke="#c7ced8" stroke-width="2"/>
+    <text x="22" y="38" font-family="sans-serif" font-size="20" font-weight="700" fill="#172033">A · 4분할 동시 보기</text>
+    <g transform="translate(22 62)">
+      <rect width="184" height="138" fill="#e8eef6" stroke="#8b98aa"/>
+      <rect x="8" y="8" width="168" height="122" fill="#f6f8fb" stroke="#c3ccd8"/>
+      <path d="M45 112V53h93v59M58 53V38h69v15" fill="none" stroke="#56677d" stroke-width="7"/>
+      <text x="56" y="125" font-family="sans-serif" font-size="12" fill="#39465a">전체</text>
+      <rect x="198" width="184" height="138" fill="#e8eef6" stroke="#8b98aa"/>
+      <path d="M238 112V38h102v74M250 58h78" fill="none" stroke="#56677d" stroke-width="7"/>
+      <text x="252" y="125" font-family="sans-serif" font-size="12" fill="#39465a">전면</text>
+      <rect y="150" width="184" height="138" fill="#e8eef6" stroke="#8b98aa"/>
+      <path d="M37 114h105V60H37M58 60V40h60" fill="none" stroke="#56677d" stroke-width="7"/>
+      <text x="54" y="276" font-family="sans-serif" font-size="12" fill="#39465a">측면</text>
+      <rect x="198" y="150" width="184" height="138" fill="#e8eef6" stroke="#8b98aa"/>
+      <path d="M238 84h102M249 54v60M328 54v60" fill="none" stroke="#56677d" stroke-width="7"/>
+      <text x="252" y="276" font-family="sans-serif" font-size="12" fill="#39465a">상면</text>
+    </g>
+    <text x="22" y="382" font-family="sans-serif" font-size="15" fill="#39465a">장점: 전체 맥락과 방향을 한눈에 비교</text>
+    <text x="22" y="409" font-family="sans-serif" font-size="15" fill="#a33b28">단점: 창이 작아 작은 명판을 읽기 어려움</text>
+  </g>
+  <g transform="translate(530 82)">
+    <rect width="430" height="440" rx="14" fill="#fff" stroke="#1f6feb" stroke-width="3"/>
+    <text x="22" y="38" font-family="sans-serif" font-size="20" font-weight="700" fill="#172033">B · 선택 지점 집중 보기 (선택)</text>
+    <g transform="translate(22 62)">
+      <rect width="386" height="230" fill="#e8eef6" stroke="#8b98aa"/>
+      <path d="M48 194V72h286v122M68 72V46h244v26M92 105h92M222 105h78" fill="none" stroke="#56677d" stroke-width="10"/>
+      <rect x="162" y="117" width="60" height="38" rx="3" fill="#1f6feb"/>
+      <rect x="178" y="126" width="29" height="18" fill="#fff4d4"/>
+      <path d="M193 117V93" stroke="#1f6feb" stroke-width="3"/>
+      <circle cx="193" cy="88" r="6" fill="#1f6feb"/>
+      <text x="229" y="141" font-family="sans-serif" font-size="13" fill="#172033">선택 표지</text>
+      <rect y="246" width="386" height="44" rx="5" fill="#f6f8fb" stroke="#c3ccd8"/>
+      <text x="14" y="274" font-family="sans-serif" font-size="14" fill="#39465a">[ P1 ] [ P2 ] [ P3 ] [ P4 ] [ P5 ] [ P6 ] [ O1 ] [ O2 ]</text>
+    </g>
+    <text x="22" y="382" font-family="sans-serif" font-size="15" fill="#087443">장점: 큰 화면과 목적별 시점으로 표지 가독성 향상</text>
+    <text x="22" y="409" font-family="sans-serif" font-size="15" fill="#39465a">보완: 완료 표시, 전체 복귀, 비교 때 가림 숨김</text>
+  </g>
+  <text x="40" y="558" font-family="sans-serif" font-size="15" fill="#39465a">선택 근거: 작은 패널에 화면을 나누기보다 한 번에 한 지점을 크게 보여 주고, 비교 과제는 별도 직교 시점으로 분리한다.</text>
+</svg>

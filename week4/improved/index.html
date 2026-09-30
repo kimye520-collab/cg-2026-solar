@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>복합 연구시설 — 기본 트랙볼 뷰어</title><link rel="stylesheet" href="demo.css">
+<style>
+.wrap{grid-template-columns:minmax(0,1fr) 18rem;height:100vh;height:100dvh;min-height:500px}.stage{display:grid;grid-template-rows:minmax(240px,1fr) auto auto;align-items:stretch;justify-content:stretch;min-height:0;overflow:auto}.viewport{position:relative;min-height:0}.stage canvas{position:absolute;inset:0;display:block;width:100%;height:100%;max-height:none;cursor:grab}
+canvas:focus-visible{outline:2px solid var(--d-accent);outline-offset:-2px}.readings{padding:10px 14px;white-space:pre-wrap;font:12px/1.6 monospace;color:var(--d-ink)}
+.instructions{padding:0 14px}.tasks{padding-left:22px}.tasks li{margin:9px 0}.actions{display:flex;gap:8px;flex-wrap:wrap}.actions button{flex:1}
+.tasks .task-focus{width:100%;padding:6px 8px;border:1px solid var(--d-line-strong);border-radius:5px;background:var(--d-bg-soft);color:var(--d-ink);font:inherit;font-size:11.5px;font-weight:700;text-align:left;cursor:pointer}
+.tasks .task-focus:hover,.tasks .task-focus[aria-pressed="true"]{border-color:var(--d-accent);color:var(--d-accent)}
+.tasks .task-focus:focus-visible{outline:2px solid var(--d-accent);outline-offset:2px}
+.tasks li p{margin:4px 0 0;color:var(--d-muted);font-size:11px}
+.task-complete{display:inline-flex;align-items:center;gap:4px;margin-top:4px;color:var(--d-muted);font-size:10.5px;cursor:pointer}
+.task-complete input{margin:0;accent-color:var(--d-accent)}
+.task-progress{padding:6px 8px;border:1px solid var(--d-line);border-radius:5px;background:var(--d-bg-soft);color:var(--d-ink);font-size:11px;font-weight:700}
+.task-status{padding:7px 9px;border-left:2px solid var(--d-accent);background:var(--d-bg-soft);color:var(--d-ink-soft);font-size:11px}
+@media(max-width:900px){.wrap{display:block;height:auto}.panel{border-left:0;max-height:none}.stage{height:100vh;height:100dvh;min-height:500px}}
+</style></head><body>
+<div class="wrap"><div class="stage">
+<div class="viewport"><canvas id="cv" tabindex="0" aria-label="다층 연구시설의 3차원 모델. 드래그로 회전, Shift 드래그로 이동, 휠로 확대">WebGL2를 지원하는 브라우저에서 실행하세요.</canvas></div>
+<p class="instructions">드래그: 트랙볼 회전 · Shift+드래그 / 오른쪽 드래그: 평행 이동 · 휠: 거리 조절<br>키보드 방향키: 회전 · + / −: 거리 조절 · Home: 전체 보기 · O1/O2: 직교 비교(재선택 시 기본 배율 복귀)</p>
+<pre class="readings" id="readings"></pre></div>
+<div class="panel"><h1>복합 연구시설 관찰</h1><p class="sub">관찰 항목을 선택하면 표지 정면으로 이동합니다. O1·O2는 각각 전면·측면 직교 뷰에서 비교합니다.</p>
+<div class="actions"><button class="btn" id="home" type="button">전체 보기</button><button class="btn" id="measure" type="button">측정 시작 / 초기화</button></div>
+<ol class="tasks" id="tasks"></ol><div id="student-ui"></div>
+<p class="note">관찰 항목을 고른 뒤 드래그·휠로 시점을 미세 조정하고, 실제로 확인한 항목만 관찰 완료로 표시하세요. 전체 보기 버튼이나 다른 항목 선택으로 구조를 복원합니다. O1은 전면(+z), O2는 오른쪽 측면(+x)에서 같은 기본 직교 배율로 비교하며, 비교 중 건물·부대 설비는 숨김 상태로 표시됩니다.</p>
+
+</div></div>
+<script src="demo.js"></script><script src="d04-inspection-model.js?v=3f1b6bc733"></script><script src="d04-inspection-controls.js?v=guided-focus-1"></script><script src="d04-inspection-viewer.js?v=8a4c2fbf62"></script><script src="d04-inspection-student.js?v=ortho-progress-5"></script>
+</body></html>
